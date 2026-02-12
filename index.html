@@ -411,8 +411,8 @@
         playerEmoji: "🧺", 
         items: ["❤️", "💖", "💞", "💌", "🌸", "🧸", "🍫"], 
         speed: 3.5, 
-        targetScore: 3, 
-        clicksNeeded: 5, 
+        targetScore: 33, 
+        clicksNeeded: 50, 
         spawnRate: 40,
         puzzleImage: "our_photo.jpg" 
     };
@@ -791,33 +791,47 @@
     let yesScale = 1;
 
     function onNoClicked(e) {
-        // Выбираем фразу
-        const text = noPhrases[noClickCount % noPhrases.length];
-        noClickCount++; // Увеличиваем счетчик для следующего раза
+        if (noClickCount >= noPhrases.length) {
+            document.getElementById('no-btn').style.display = 'none';
+            return;
+        }
+
+        // 2. Выбираем фразу (теперь без остатка от деления %, просто по порядку)
+        const text = noPhrases[noClickCount];
+        noClickCount++; // Увеличиваем счетчик
         
         // Координаты клика для текста
         let x = e.clientX;
         let y = e.clientY;
 
         const margin = 80;
-        // Если нажали слишком слева -> двигаем вправо
         if (x < margin) x = margin;
-        
-        // Если нажали слишком справа -> двигаем влево
         if (x > width - margin) x = width - margin;
-
-        // Небольшой разброс
         x += (Math.random() * 20 - 10);
         
         // Создаем всплывашку
         const ft = new FloatingText(x, y - 40, text, "#2c3e50");
-        ft.fontSize = 20; // Покрупнее
-        ft.life = 3.0; // Живем подольше
+        ft.fontSize = 20;
+        ft.life = 2.5; // Сделали жизнь подлиннее, как обсуждали ранее
         floatingTexts.push(ft);
 
-        // Увеличиваем кнопку ДА, чтобы намекнуть
-        yesScale += 0.11;
+        // Увеличиваем кнопку ДА
+        yesScale += 0.12;
         document.getElementById('yes-btn').style.transform = `scale(${yesScale})`;
+
+        // 3. Если это была последняя фраза — скрываем кнопку "Нет"
+        if (noClickCount === noPhrases.length) {
+            // Даем небольшую задержку, чтобы пользователь успел прочитать последнюю фразу
+            setTimeout(() => {
+                const noBtn = document.getElementById('no-btn');
+                noBtn.style.transition = "opacity 0.5s, transform 0.5s";
+                noBtn.style.opacity = "0";
+                noBtn.style.transform = "scale(0)";
+                setTimeout(() => {
+                    noBtn.style.display = 'none';
+                }, 500);
+            }, 1000); 
+        }
     }
 
     function onYesClicked() {
