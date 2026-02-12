@@ -95,13 +95,14 @@
             backdrop-filter: blur(5px);
             display: flex;
             flex-direction: column;
-            justify-content: center;
+            /* Убираем жесткое центрирование по вертикали, чтобы контент не улетал вверх */
+            justify-content: flex-start; 
             align-items: center;
             z-index: 20;
             transition: opacity 0.8s, visibility 0.8s;
-            padding: 20px;
+            padding: 40px 20px; /* Добавляем отступы сверху и снизу */
             text-align: center;
-            overflow-y: auto; /* На случай если контент не влезает */
+            overflow-y: auto; /* Позволяет листать, если контент длинный */
         }
 
         .hidden {
