@@ -170,28 +170,37 @@
 
         /* --- Стили для Уровня 3 (Пазл) --- */
         #puzzle-container {
-            width: 300px;
-            height: 300px;
+            /* Делаем размер гибким: 90% от ширины экрана, но не больше 350px */
+            width: 90vw;
+            height: 90vw;
+            max-width: 350px;
+            max-height: 350px;
+            
             display: grid;
             grid-template-columns: repeat(3, 1fr);
             grid-template-rows: repeat(3, 1fr);
-            gap: 2px;
+            
+            gap: 0; 
+            
             border: 5px solid #ff9a9e;
             background: #fff;
             box-shadow: 0 10px 20px rgba(0,0,0,0.2);
             margin-bottom: 20px;
+            
+            touch-action: manipulation; 
         }
 
         .puzzle-piece {
-            background-size: 300px 300px;
+            /* Размер фона 300% (так как у нас 3 кусочка в ширину) */
+            background-size: 300% 300%;
             cursor: pointer;
             transition: transform 0.2s;
-            border-radius: 2px;
+            box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.5);
         }
 
         .puzzle-piece.selected {
-            transform: scale(0.9);
-            box-shadow: 0 0 10px #d6336c;
+            transform: scale(0.95);
+            box-shadow: 0 0 15px #d6336c;
             z-index: 10;
             border: 2px solid #d6336c;
         }
@@ -378,8 +387,8 @@
         playerEmoji: "🧺", 
         items: ["❤️", "💖", "💞", "💌", "🌸", "🧸", "🍫"], 
         speed: 3.5, 
-        targetScore: 33, 
-        clicksNeeded: 50, 
+        targetScore: 3, 
+        clicksNeeded: 5, 
         spawnRate: 40,
         puzzleImage: "our_photo.jpg" 
     };
@@ -670,10 +679,14 @@
             piece.classList.add('puzzle-piece');
             piece.style.backgroundImage = `url('${CONFIG.puzzleImage}')`;
             
-            // Вычисляем позицию фона для правильного кусочка
+            // Вычисляем ряд и колонку правильного кусочка
             const row = Math.floor(pos / 3);
             const col = pos % 3;
-            piece.style.backgroundPosition = `-${col * 100}px -${row * 100}px`;
+            
+            const x = col * 50; 
+            const y = row * 50;
+            
+            piece.style.backgroundPosition = `${x}% ${y}%`;
 
             if (index === selectedPieceIndex) {
                 piece.classList.add('selected');
