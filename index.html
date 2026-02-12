@@ -492,15 +492,51 @@
             this.life -= 0.015;
         }
         draw() {
-            ctx.save();
+ctx.save();
             ctx.globalAlpha = Math.max(0, this.life);
-            ctx.font = `bold ${this.fontSize}px Nunito`;
+            
+            // Адаптивный размер шрифта (поменьше для телефонов)
+            const fontSize = width < 500 ? 20 : 24; 
+            ctx.font = `bold ${fontSize}px Nunito`;
+            
             ctx.fillStyle = this.color;
             ctx.textAlign = "center";
             ctx.strokeStyle = "white"; 
-            ctx.lineWidth = 3;
-            ctx.strokeText(this.text, this.x, this.y);
-            ctx.fillText(this.text, this.x, this.y);
+            ctx.lineWidth = 4; // Жирная обводка, чтобы читалось на фоне
+
+            // Логика переноса слов
+            const lineHeight = fontSize * 1.2; // Высота строки
+            const maxWidth = width * 0.9;     // Текст не шире 85% экрана
+            
+            // Разбиваем фразу на слова по пробелам
+            const words = this.text.split(' ');
+            let line = '';
+            let currentY = this.y;
+
+            for(let n = 0; n < words.length; n++) {
+                // Пробуем добавить следующее слово к строке
+                const testLine = line + words[n] + ' ';
+                const metrics = ctx.measureText(testLine);
+                const testWidth = metrics.width;
+
+                // Если строка стала длиннее, чем экран (maxWidth)
+                if (testWidth > maxWidth && n > 0) {
+                    // Рисуем то, что накопили
+                    ctx.strokeText(line, this.x, currentY);
+                    ctx.fillText(line, this.x, currentY);
+                    
+                    // Начинаем новую строку с текущего слова
+                    line = words[n] + ' ';
+                    currentY += lineHeight; // Спускаемся вниз
+                } else {
+                    // Если влезает, просто добавляем слово
+                    line = testLine;
+                }
+            }
+            // Рисуем последнюю оставшуюся строку
+            ctx.strokeText(line, this.x, currentY);
+            ctx.fillText(line, this.x, currentY);
+
             ctx.restore();
         }
     }
