@@ -323,6 +323,14 @@
             to { opacity: 1; transform: scale(1); }
         }
 
+        @media (max-width: 600px) {
+            #question-screen h2 {
+                font-size: 1.8rem !important; /* Уменьшаем шрифт заголовков на телефонах */
+            }
+            h1 {
+                font-size: 2.5rem !important;
+            }
+        }
     </style>
 </head>
 <body>
@@ -367,15 +375,20 @@
 
 <!-- Экран Вопроса -->
 <div id="question-screen" class="overlay hidden">
-    <h1>Мы идеально дополняем друг друга</h1>
-    
-    <img id="final-photo" src="" alt="Мы" class="question-photo">
+    <!-- Обертка, которая поможет центрировать контент, если он влезает, и не обрезать, если нет -->
+    <div style="margin: auto 0; width: 100%; display: flex; flex-direction: column; align-items: center;">
+        
+        <h2 style="color: #d6336c; font-family: 'Marck Script'; margin: 10px 0;">Мы идеально дополняем друг друга</h2>
+        
+        <img id="final-photo" src="" alt="Мы" class="question-photo">
 
-    <h2 style="color: #d6336c; font-family: 'Marck Script'; font-size: 2.8rem; margin: 10px 0;">Ты будешь моей Валентинкой? 🌹</h2>
-    
-    <div class="btn-group">
-        <button id="yes-btn" class="btn" onclick="onYesClicked()">Конечно! ДА! ❤️</button>
-        <button id="no-btn" class="btn" onclick="onNoClicked(event)">Нет...</button>
+        <h2 style="color: #d6336c; font-family: 'Marck Script'; margin: 10px 0;">Ты будешь моей Валентинкой? 🌹</h2>
+        
+        <div class="btn-group">
+            <button id="yes-btn" class="btn" onclick="onYesClicked()">Конечно! ДА! ❤️</button>
+            <button id="no-btn" class="btn" onclick="onNoClicked(event)">Нет...</button>
+        </div>
+        
     </div>
 </div>
 
