@@ -366,7 +366,7 @@
 
 <!-- Экран Вопроса -->
 <div id="question-screen" class="overlay hidden">
-    <h1>Мы идеально дополняем друг друга</h1>
+    <h2 style="color: #d6336c; font-family: 'Marck Script'; font-size: 2.8rem; margin: 10px 0;">Мы идеально дополняем друг друга</h2>
     
     <img id="final-photo" src="" alt="Мы" class="question-photo">
 
@@ -643,7 +643,7 @@
             const level2 = document.getElementById('level-2-screen');
             level2.classList.remove('hidden');
             level2.classList.add('fade-in-level');
-        }, 1500);
+        }, 1000);
     }
 
     function clickHeart(e) {
@@ -798,6 +798,7 @@
         // Создаем всплывашку
         const ft = new FloatingText(x, y - 40, text, "#2c3e50");
         ft.fontSize = 20; // Покрупнее
+        ft.life = 3.0; // Живем подольше
         floatingTexts.push(ft);
 
         // Увеличиваем кнопку ДА, чтобы намекнуть
