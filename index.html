@@ -738,12 +738,20 @@
         // Координаты клика для текста
         let x = e.clientX;
         let y = e.clientY;
+
+        const margin = 80;
+        // Если нажали слишком слева -> двигаем вправо
+        if (x < margin) x = margin;
+        
+        // Если нажали слишком справа -> двигаем влево
+        if (x > width - margin) x = width - margin;
+
         // Небольшой разброс
-        x += (Math.random() * 40 - 20);
+        x += (Math.random() * 20 - 10);
         
         // Создаем всплывашку
         const ft = new FloatingText(x, y - 40, text, "#2c3e50");
-        ft.fontSize = 24; // Покрупнее
+        ft.fontSize = 20; // Покрупнее
         floatingTexts.push(ft);
 
         // Увеличиваем кнопку ДА, чтобы намекнуть
