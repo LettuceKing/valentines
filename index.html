@@ -255,11 +255,21 @@
 
         .letter-card {
             background: #fff;
-            padding: 40px;
-            border-radius: 10px;
-            border: 2px dashed #ff9a9e;
+            
+            width: 90%;           
+            max-width: 500px;     
+            
+            max-height: 80vh;  
+            overflow-y: auto;     
+            margin: auto;        
+            
+            padding: 25px;        
+            border-radius: 15px;  
+
+            border: 4px dashed #ff9a9e; 
+            
             box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-            max-width: 600px;
+            
             transform: translateY(20px);
             opacity: 0;
             transition: all 1s ease 0.5s;
@@ -492,7 +502,7 @@
             this.life -= 0.015;
         }
         draw() {
-ctx.save();
+            ctx.save();
             ctx.globalAlpha = Math.max(0, this.life);
             
             // Адаптивный размер шрифта (поменьше для телефонов)
