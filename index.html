@@ -503,57 +503,84 @@
 
     class FloatingText {
         constructor(x, y, text, color = "#d6336c") {
-            this.originalX = x; // Запоминаем, где поймали
+            this.x = x;
             this.y = y;
             this.text = text;
             this.color = color;
-            this.life = 1.0;
-            this.dy = -1.5; 
+            this.life = 1.0; // Время жизни текста
+            this.dy = -1.5;  // Скорость всплытия
         }
 
         update() {
-            this.y += this.dy; // Текст летит вверх
-            this.life -= 0.012; // Исчезает чуть медленнее
+            this.y += this.dy;
+            this.life -= 0.012; 
         }
 
         draw() {
             ctx.save();
             ctx.globalAlpha = Math.max(0, this.life);
             
-            // 1. Настраиваем шрифт
-            const fontSize = width < 500 ? 22 : 28; 
+            // Настройка шрифта
+            // На мобилках чуть меньше (20px), на пк (24px)
+            const fontSize = width < 500 ? 20 : 24; 
             ctx.font = `bold ${fontSize}px Nunito`;
-            
-            // 2. Измеряем реальную ширину текста
-            const metrics = ctx.measureText(this.text);
-            const textWidth = metrics.width;
-            const halfWidth = textWidth / 2;
-            const padding = 15; // Отступ от края экрана в пикселях
+            const lineHeight = fontSize * 1.2;
 
-            // 3. Вычисляем координату X, чтобы текст не улетал
-            let drawX = this.originalX;
+            // --- 1. ЛОГИКА ПЕРЕНОСА СТРОК ---
+            // Максимальная ширина текста (90% от ширины экрана)
+            const maxWidth = width * 0.9; 
+            const words = this.text.split(' ');
+            let lines = [];
+            let currentLine = words[0];
 
-            // Если левый край текста (центр - половина) вылезает за левую границу (0)
+            for (let i = 1; i < words.length; i++) {
+                const testLine = currentLine + " " + words[i];
+                const metrics = ctx.measureText(testLine);
+                if (metrics.width < maxWidth) {
+                    currentLine = testLine;
+                } else {
+                    lines.push(currentLine);
+                    currentLine = words[i];
+                }
+            }
+            lines.push(currentLine);
+
+            // --- 2. ПОИСК САМОЙ ШИРОКОЙ СТРОКИ ---
+            let maxLineWidth = 0;
+            lines.forEach(line => {
+                const w = ctx.measureText(line).width;
+                if (w > maxLineWidth) maxLineWidth = w;
+            });
+
+            // --- 3. КОРРЕКЦИЯ ПОЗИЦИИ (ЧТОБЫ НЕ ВЫЛЕЗАЛО) ---
+            let drawX = this.x;
+            const halfWidth = maxLineWidth / 2;
+            const padding = 15; // Отступ от края экрана
+
+            // Если левый край текста уходит за экран -> сдвигаем вправо
             if (drawX - halfWidth < padding) {
                 drawX = halfWidth + padding;
             }
-            // Если правый край текста (центр + половина) вылезает за правую границу (width)
+            // Если правый край уходит за экран -> сдвигаем влево
             else if (drawX + halfWidth > width - padding) {
                 drawX = width - halfWidth - padding;
             }
 
-            // 4. Рисуем текст в новых координатах
+            // --- 4. ОТРИСОВКА ---
             ctx.textAlign = "center";
             ctx.textBaseline = "middle";
-            
-            // Обводка
-            ctx.strokeStyle = "white"; 
-            ctx.lineWidth = 4; 
-            ctx.strokeText(this.text, drawX, this.y);
-
-            // Заливка
             ctx.fillStyle = this.color;
-            ctx.fillText(this.text, drawX, this.y);
+            ctx.strokeStyle = "white"; 
+            ctx.lineWidth = 4;
+
+            // Рисуем каждую строку со смещением вниз
+            lines.forEach((line, i) => {
+                // Сдвиг по Y для каждой новой строки
+                const lineY = this.y + (i * lineHeight); 
+                
+                ctx.strokeText(line, drawX, lineY);
+                ctx.fillText(line, drawX, lineY);
+            });
 
             ctx.restore();
         }
