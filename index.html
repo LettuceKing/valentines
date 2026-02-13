@@ -507,76 +507,74 @@
             this.y = y;
             this.text = text;
             this.color = color;
-            this.life = 1.0; // Время жизни текста
-            this.dy = -1.5;  // Скорость всплытия
+            this.life = 1.0;
+            this.dy = -1.5; 
         }
 
         update() {
             this.y += this.dy;
-            this.life -= 0.012; 
+            this.life -= 0.010; // Чуть медленнее исчезает, чтобы успеть прочитать
         }
 
         draw() {
             ctx.save();
             ctx.globalAlpha = Math.max(0, this.life);
             
-            // Настройка шрифта
-            // На мобилках чуть меньше (20px), на пк (24px)
+            // 1. Сначала задаем шрифт (ВАЖНО для измерений)
             const fontSize = width < 500 ? 20 : 24; 
             ctx.font = `bold ${fontSize}px Nunito`;
             const lineHeight = fontSize * 1.2;
 
-            // --- 1. ЛОГИКА ПЕРЕНОСА СТРОК ---
-            // Максимальная ширина текста (90% от ширины экрана)
-            const maxWidth = width * 0.9; 
+            // 2. Разбиваем на строки (Word Wrap)
+            // Ограничиваем ширину текста 80% от экрана
+            const maxTextWidth = width * 0.8; 
             const words = this.text.split(' ');
             let lines = [];
             let currentLine = words[0];
 
             for (let i = 1; i < words.length; i++) {
-                const testLine = currentLine + " " + words[i];
-                const metrics = ctx.measureText(testLine);
-                if (metrics.width < maxWidth) {
-                    currentLine = testLine;
+                const word = words[i];
+                const width = ctx.measureText(currentLine + " " + word).width;
+                if (width < maxTextWidth) {
+                    currentLine += " " + word;
                 } else {
                     lines.push(currentLine);
-                    currentLine = words[i];
+                    currentLine = word;
                 }
             }
             lines.push(currentLine);
 
-            // --- 2. ПОИСК САМОЙ ШИРОКОЙ СТРОКИ ---
-            let maxLineWidth = 0;
+            // 3. Вычисляем ширину самой длинной строки
+            let maxWidthInBlock = 0;
             lines.forEach(line => {
                 const w = ctx.measureText(line).width;
-                if (w > maxLineWidth) maxLineWidth = w;
+                if (w > maxWidthInBlock) maxWidthInBlock = w;
             });
 
-            // --- 3. КОРРЕКЦИЯ ПОЗИЦИИ (ЧТОБЫ НЕ ВЫЛЕЗАЛО) ---
+            // 4. Корректируем X (Сдвигаем блок, если он у края)
             let drawX = this.x;
-            const halfWidth = maxLineWidth / 2;
-            const padding = 15; // Отступ от края экрана
+            const halfWidth = maxWidthInBlock / 2;
+            const padding = 20; // Отступ от края экрана
 
-            // Если левый край текста уходит за экран -> сдвигаем вправо
+            // Если левый край текста вылезает влево (< 0)
             if (drawX - halfWidth < padding) {
-                drawX = halfWidth + padding;
+                drawX = padding + halfWidth;
             }
-            // Если правый край уходит за экран -> сдвигаем влево
+            // Если правый край текста вылезает вправо (> width)
             else if (drawX + halfWidth > width - padding) {
-                drawX = width - halfWidth - padding;
+                drawX = width - padding - halfWidth;
             }
 
-            // --- 4. ОТРИСОВКА ---
+            // 5. Рисуем
             ctx.textAlign = "center";
             ctx.textBaseline = "middle";
             ctx.fillStyle = this.color;
             ctx.strokeStyle = "white"; 
             ctx.lineWidth = 4;
 
-            // Рисуем каждую строку со смещением вниз
             lines.forEach((line, i) => {
-                // Сдвиг по Y для каждой новой строки
-                const lineY = this.y + (i * lineHeight); 
+                // Сдвигаем каждую строку вниз
+                const lineY = this.y + (i * lineHeight);
                 
                 ctx.strokeText(line, drawX, lineY);
                 ctx.fillText(line, drawX, lineY);
