@@ -503,6 +503,14 @@
 
    class FloatingText {
         constructor(x, y, text, color = "#d6336c") {
+            let safeMargin = 120;
+            
+            if (width < 500) safeMargin = 80;
+
+            if (x < safeMargin) x = safeMargin;
+            
+            if (x > width - safeMargin) x = width - safeMargin;
+            
             this.x = x;
             this.y = y;
             this.text = text;
